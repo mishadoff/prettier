@@ -33,3 +33,31 @@
     (is (= "3megabytes" (size/bytes->readable 2723446)))
     (is (= "3gigabytes" (size/bytes->readable 3723446000)))
     (is (= "...too much..." (size/bytes->readable 1723446000000)))))
+
+;;;
+
+(deftest readable->bytes--test
+  (is (= 1 (size/readable->bytes "1b")))
+  (is (= 1024 (size/readable->bytes "1kb")))
+  (is (= 1024 (size/readable->bytes "1 KB")))
+  (is (= 102400 (size/readable->bytes "100K")))
+  (is (= 104857600 (size/readable->bytes "100M")))
+  (is (= 524288000 (size/readable->bytes "500mb")))
+  (is (= 5368709120 (size/readable->bytes "5G")))
+  (is (= 1319413953331 (size/readable->bytes "1.2Tb"))))
+
+(deftest readable->bytes--errors-test
+  (is (nil? (size/readable->bytes "")))
+  (is (nil? (size/readable->bytes "100")))
+  (is (nil? (size/readable->bytes "1 Megabyte")))
+  (is (nil? (size/readable->bytes "-100K")))
+  (is (thrown? AssertionError (size/readable->bytes 1)))
+  (is (thrown? AssertionError (size/readable->bytes nil)))
+  (is (thrown? AssertionError (size/readable->bytes {}))))
+
+(deftest readable->bytes--customizations-test
+  (binding [size/*size-parseable-units* [#"(?i)byte" #"(?i)kilobyte" #"(?i)megabyte"]]
+    (is (= 1 (size/readable->bytes "1 Byte")))
+    (is (= 1024 (size/readable->bytes "1 Kilobyte")))
+    (is (= 1048576 (size/readable->bytes "1 Megabyte")))
+    (is (nil? (size/readable->bytes "1 Gigabyte")))))

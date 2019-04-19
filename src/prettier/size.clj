@@ -1,5 +1,6 @@
 (ns prettier.size
-  (:require [clojure.spec.alpha :as s]))
+  (:require [clojure.spec.alpha :as s]
+            [clojure.string :as str]))
 
 (def ^:dynamic *size-abbreviations*
   ["B" "KB" "MB" "GB" "TB" "PB" "EB" "ZB" "YB"])
@@ -26,8 +27,34 @@
 
 ;;;
 
+(def ^:dynamic *size-parseable-units*
+  [#"(?i)b"
+   #"(?i)k|kb"
+   #"(?i)m|mb"
+   #"(?i)g|gb"
+   #"(?i)t|tb"
+   #"(?i)p|pb"
+   #"(?i)e|eb"
+   #"(?i)z|zb"
+   #"(?i)y|yb"])
+
 (defn readable->bytes
   "Transform readable size string into bytes integer"
   [s]
   {:pre [(string? s)]}
-  1)
+  (let [[_ p1 p2 unit] (re-matches #"(\d+)(\.\d+)?\s*(.*)" s)
+        order (->> *size-parseable-units*
+                   (map-indexed (fn [idx re]
+                                  [(some->> unit
+                                            (re-matches re))
+                                   idx]))
+                   (filter first)
+                   first
+                   second)]
+    (when (and p1 order)
+      (some-> (str p1 p2)
+              (bigdec)
+              (* (->> (repeat order 1024)
+                      (reduce *')))
+              (bigint)
+              ))))
