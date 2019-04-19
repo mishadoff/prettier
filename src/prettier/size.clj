@@ -52,9 +52,9 @@
                    first
                    second)]
     (when (and p1 order)
-      (some-> (str p1 p2)
-              (bigdec)
-              (* (->> (repeat order 1024)
-                      (reduce *')))
-              (bigint)
-              ))))
+      (-> (str p1 p2)
+          (bigdec)
+          (* (->> (repeat order 1024)
+                  (reduce *')))
+          (bigint)
+          ))))

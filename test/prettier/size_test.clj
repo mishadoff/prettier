@@ -49,6 +49,7 @@
 (deftest readable->bytes--errors-test
   (is (nil? (size/readable->bytes "")))
   (is (nil? (size/readable->bytes "100")))
+  (is (nil? (size/readable->bytes "GB")))
   (is (nil? (size/readable->bytes "1 Megabyte")))
   (is (nil? (size/readable->bytes "-100K")))
   (is (thrown? AssertionError (size/readable->bytes 1)))
