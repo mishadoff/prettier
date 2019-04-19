@@ -1,6 +1,4 @@
-(ns prettier.size
-  (:require [clojure.spec.alpha :as s]
-            [clojure.string :as str]))
+(ns prettier.size)
 
 (def ^:dynamic *size-abbreviations*
   ["B" "KB" "MB" "GB" "TB" "PB" "EB" "ZB" "YB"])
@@ -56,5 +54,4 @@
           (bigdec)
           (* (->> (repeat order 1024)
                   (reduce *')))
-          (bigint)
-          ))))
+          (bigint)))))

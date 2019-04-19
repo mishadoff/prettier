@@ -44,7 +44,8 @@
   (is (= 104857600 (size/readable->bytes "100M")))
   (is (= 524288000 (size/readable->bytes "500mb")))
   (is (= 5368709120 (size/readable->bytes "5G")))
-  (is (= 1319413953331 (size/readable->bytes "1.2Tb"))))
+  (is (= 1319413953331 (size/readable->bytes "1.2Tb")))
+  (is (= 2417 (size/readable->bytes "0.000000000000000000002YB"))))
 
 (deftest readable->bytes--errors-test
   (is (nil? (size/readable->bytes "")))
