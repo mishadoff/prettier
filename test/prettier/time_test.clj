@@ -44,3 +44,7 @@
             time/*time-units* {:days "DAYS" :weeks "WEEKS" :months "MONTHS"}]
     (is (= "2 MONTHS 1 WEEKS 5 DAYS" (time/interval->readable 5900000000)))
     (is (= "3 WEEKS 2 DAYS" (time/interval->readable 2000000000)))))
+
+(deftest interval->readable--invalid-time-units
+  (binding [time/*time-units* {}]
+    (is (thrown? AssertionError (time/interval->readable 1)))))
