@@ -31,7 +31,7 @@
 
 ;;;
 
-(defn interval->readable [ms]
+(defn ms->readable [ms]
   {:pre [(and (not (empty? *time-units*))
               (integer? ms)
               (> ms 0))]}
@@ -56,3 +56,7 @@
                      (filter (fn [[_ v]] (> v 0)))
                      (map (fn [[t v]] (str v *time-unit-gap* (*time-units* t))))
                      (str/join *time-unit-separator*)))))))
+
+(defn readable->ms [s]
+  ;; TODO
+  )
