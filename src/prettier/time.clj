@@ -1,5 +1,6 @@
 (ns prettier.time
-  (:require [clojure.string :as str]))
+  (:require [clojure.string :as str]
+            [prettier.util :as u]))
 
 (def ^:dynamic *time-hierarchy*
   [[:milliseconds 1]
@@ -19,6 +20,15 @@
    :days         "days"
    :months       "months"
    :years        "years"})
+
+(def ^:dynamic *reverse-time-units*
+  {:milliseconds #{"ms" "msec" "msecs" "millisecond" "milliseconds"}
+   :seconds #{"s" "sec" "secs" "second" "seconds"}
+   :minutes #{"m" "min" "mins" "minute" "minutes"}
+   :hours #{"h" "hs" "hour" "hours"}
+   :days #{"d" "ds" "day" "days"}
+   :months #{"mon" "month" "months"}
+   :years #{"y" "ys" "year" "years"}})
 
 (def ^:dynamic *time-unit-gap* " ")
 (def ^:dynamic *time-unit-separator* " ")
@@ -58,5 +68,21 @@
                      (str/join *time-unit-separator*)))))))
 
 (defn readable->ms [s]
-  ;; TODO
-  )
+  (let [[num unit] (u/number-and-unit s)
+        unit (some-> unit str/lower-case)
+        known-time-units (->> (time-hierarchy-reductions)
+                              (into {}))]
+    (some->> *reverse-time-units*
+             (map (fn [[unit-key candidates]]
+                    (when (candidates unit) unit-key)))
+             ((fn [e] (println e) e))
+             (remove nil?)
+             ;; ambiguity check
+             ((fn [v]
+                (if (> (count v) 1)
+                  (throw (AssertionError. (str "Ambiguity for " '*reverse-time-units* ":" v)))
+                  v)))
+             (first)
+             (known-time-units)
+             (* num)
+             (bigint))))

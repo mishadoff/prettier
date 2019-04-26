@@ -38,6 +38,7 @@
 
 (deftest readable->bytes--test
   (is (= 1 (size/readable->bytes "1b")))
+  (is (= 0 (size/readable->bytes "0b")))
   (is (= 1024 (size/readable->bytes "1kb")))
   (is (= 1024 (size/readable->bytes "1 KB")))
   (is (= 102400 (size/readable->bytes "100K")))

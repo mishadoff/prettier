@@ -1,4 +1,5 @@
-(ns prettier.size)
+(ns prettier.size
+  (:require [prettier.util :as u]))
 
 (def ^:dynamic *size-abbreviations*
   ["B" "KB" "MB" "GB" "TB" "PB" "EB" "ZB" "YB"])
@@ -40,7 +41,7 @@
   "Transform readable size string into bytes integer"
   [s]
   {:pre [(string? s)]}
-  (let [[_ p1 p2 unit] (re-matches #"(\d+)(\.\d+)?\s*(.*)" s)
+  (let [[num unit] (u/number-and-unit s)
         order (->> *size-parseable-units*
                    (map-indexed (fn [idx re]
                                   [(some->> unit
@@ -49,9 +50,8 @@
                    (filter first)
                    first
                    second)]
-    (when (and p1 order)
-      (-> (str p1 p2)
-          (bigdec)
+    (when (and num (>= num 0) order)
+      (-> num
           (* (->> (repeat order 1024)
                   (reduce *')))
           (bigint)))))
