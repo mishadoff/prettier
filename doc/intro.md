@@ -4,7 +4,9 @@ TODO
 
 # `prettier.size`
 
-`(:require [prettier.size :as size])`
+```clojure
+(:require [prettier.size :as size])
+```
 
 Size module can convert bytes to human readable representation.
 
@@ -19,7 +21,7 @@ Size module can convert bytes to human readable representation.
 It uses binary prefixes (kibi-, mebi-), 
 which are powers of 1024 instead of 1000.
 
-To switch back to classical units with power of 1000 use bindings
+To switch back to classical units with power of 1000 use `*power*`
 
 ```clojure
 (binding [size/*power* 1000]
@@ -59,4 +61,55 @@ Custom parsing options could be provided using bindings.
 
 # `prettier.time`
 
+```clojure
+(:require [prettier.time :as time])
+```
+
+How often do you add something like 
+
+```clojure
+(let [time-taken (- (System/currentTimeInMillis) before)]
+  (log/info "Time taken" time-taken))
+```
+
+to calculate elapsed time? 
+And spend non-trivial amount of time 
+to understand what 23674133 means. Well, until now.
+
+```clojure
+(time/ms->readable 23674133)
+=> "6 hours 34 minutes 34 seconds 133 milliseconds"
+```
+
+To force elapsed time to be decimal number in one specific unit -
+redefine `*time-units*` 
+
+```clojure
+(binding [time/*time-units* {:hours "hours"}]
+  (time/ms->readable 23674133))
+=> "6.6 hours"
+```
+
+To customize the output, use bindings.  
+Notice, some units can be omitted if not needed.
+
+```clojure
+(binding [time/*time-units* {:minutes "m"
+                             :hours   "h"
+                             :days    "d"}
+          time/*time-unit-gap* ""
+          time/*time-unit-separator* ""]
+  (time/ms->readable 23674133))
+=> "6h34m"
+```
+
+Alternatively, you can provide time period 
+and parse back to milliseconds.
+
+```clojure
+(time/readable->ms "1.5 hours")
+=> 5400000
+``` 
+
+Warning: only one time unit supported so far
 
