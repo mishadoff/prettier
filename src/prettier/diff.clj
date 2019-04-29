@@ -23,7 +23,7 @@
 
 (defn- maps-basic-changes
   "Detect basic changes between unnested maps
-   Handles :added and :deleted types."
+   Handles MapEntryAdded and MapEntryDelete types."
   [before after change-fn]
   (->> before
        (map (fn [[k v]]
@@ -34,16 +34,16 @@
 ;;;
 
 (defn maps-edited-changes
-  "Detects :edited changes using basic :added and :deleted changes
+  "Detects 'edited' changes using basic 'added' and 'deleted' changes
    Uses squash rule to merge two changes into one
-    {:change :deleted :path [:a] :value 1}
-    {:change :added   :path [:a] :value 2}
+    MapEntryDeleted{:key [:a], :value 1}
+    MapEntryAdded{:key [:a], :value 2}
                 vvv
-    {:change :edited :path [:a] :value-from 1 :value-to 2}
+    MapValueChanged{:key [:a] :value-from 1 :value-to 2}
 
    Returns vector of 2 values
-    - :edited changes to be added to result
-    - :added and :deleted changes used for merge to be deleted from result"
+    - edited changes to be added to result
+    - added and deleted changes used for merge to be deleted from result"
   [basic-changes]
   (->> basic-changes
        (group-by :key)
@@ -61,6 +61,34 @@
 
 ;;;
 
+(defn maps-renamed-changes
+  "Detects 'renamed' changes using basic :added and :deleted changes
+   Uses squash rule to merge two changes into one
+    MapEntryDeleted{:key [:a], :value 1}
+      MapEntryAdded{:key [:b], :value 1}
+                vvv
+    MapKeyRenamed{:key-from [:a], :key-to [:b], :value 1}
+
+   Returns vector of 2 values
+    - renamed changes to be added to result
+    - added and deleted changes used for merge to be deleted from result"
+  [basic-changes]
+  (->> basic-changes
+       (group-by :value)
+       (filter (fn [[_ changes]]
+                 (and (= (count changes) 2)
+                      (= #{MapEntryAdded MapEntryDeleted}
+                         (->> changes (map type) (into #{}))))))
+       (map (fn [[v changes]]
+              (let [deleted (->> changes (filter #(= MapEntryDeleted (type %))) first)
+                    added (->> changes (filter #(= MapEntryAdded (type %))) first)]
+                [(->MapKeyRenamed (:key deleted) (:key added) v) changes])))
+       (reduce (fn [[acc-e acc-changes] [e changes]]
+                 [(conj acc-e e) (concat changes acc-changes)])
+               [[] []])))
+
+;;;
+
 (defn maps
   "Find a difference between two maps.
    Returns a sequence of changes, which if applied in order
@@ -68,12 +96,12 @@
    Maps could be nested.
 
    Examples of basic changes:
-    {:change :deleted :path [:a :b]    :value 10}
-    {:change :added   :path [:c :d :e] :value 1}
+    MapEntryDeleted{:key [:a], :value 1}
+    MapEntryAdded{:key [:a :b :c], :value 10}
 
    Can squash basic changes to detect more advanced changes:
-    {:change :edited  :path [:a] :value-before 10 :value-after 20}
-    {:change :renamed :path-before [:a :b] [:a :c] :value 50}
+    MapValueEdited{:key [:a], :value-from 1, :value-to 2}
+    MapValueRenamed{:key-from [:a], :key-to [:b], :value 1}
    "
   [before after]
   (let [b-pairs (->> before map-into-kv-pairs (into {}))
@@ -81,7 +109,10 @@
         deleted (maps-basic-changes b-pairs a-pairs ->MapEntryDeleted)
         added (maps-basic-changes a-pairs b-pairs ->MapEntryAdded)
         added-and-deleted (concat deleted added)
-        [edited to-remove] (maps-edited-changes added-and-deleted)
-        to-remove-set (into #{} to-remove)]
-    (concat (remove to-remove-set added-and-deleted)
-            edited)))
+        enrich (fn [changes changes-fn]
+                 (let [[to-add to-remove] (changes-fn changes)
+                       to-remove-set (into #{} to-remove)]
+                   (concat (remove to-remove-set changes) to-add)))]
+    (-> added-and-deleted
+        (enrich maps-edited-changes)
+        (enrich maps-renamed-changes))))

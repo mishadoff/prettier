@@ -1,6 +1,54 @@
 # `prettier.diff`
 
-TODO
+```clojure
+(:require [prettier.diff :as diff])
+```
+
+Diff module shows changes between data structure.
+Currently, only **maps** supported.
+
+## maps
+
+For maps diff handles basic changes, like 'Added' and 'Deleted' 
+
+```clojure
+(diff/maps {:name "John"} {:city "New York"})
+=>
+(#prettier.diff.MapEntryDeleted{:key [:name], :value "John"}
+ #prettier.diff.MapEntryAdded{:key [:city], :value "New York"})
+```
+
+Also, it is smart enough to identify value editing.
+
+```clojure
+(diff/maps {:name "John"} {:name "Ivan"})
+=> (#prettier.diff.MapValueEdited{:key [:name], :value-from "John", :value-to "Ivan"})
+```
+
+For most cases it can even handle key renaming.
+
+```clojure
+(diff/maps {:name "John"} {:person-name "John"})
+=> (#prettier.diff.MapKeyRenamed{:key-from [:name], :key-to [:person-name], :value "John"})
+```
+
+All that works for nested maps
+and extremely helpful for debugging config changes
+
+```clojure
+(diff/maps {:http {:server {:host "mishadoff.com"
+                            :port 8080}
+                   :api {:endpoint "/api/v1"}}
+            :auth {:token "Xz12Hfep1m)f__f"}}
+           {:http {:server {:host "mishadoff.com"
+                            :port 8092}
+                   :api {:endpoint "/api/v3"}}
+            :auth {:refresh-token "Xz12Hfep1m)f__f"}})
+=>
+(#prettier.diff.MapValueEdited{:key [:http :server :port], :value-from 8080, :value-to 8092}
+ #prettier.diff.MapValueEdited{:key [:http :api :endpoint], :value-from "/api/v1", :value-to "/api/v3"}
+ #prettier.diff.MapKeyRenamed{:key-from [:auth :token], :key-to [:auth :refresh-token], :value "Xz12Hfep1m)f__f"})
+```
 
 # `prettier.size`
 

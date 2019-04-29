@@ -6,10 +6,11 @@
   - readable->bytes
 - diff
   - maps
-    - added
-    - deleted
-    - renamed
-    - changed
+    + added
+    + deleted
+    + renamed
+    + changed
+    - nested maps movement
   - vectors
 - plurals
   - dsl
