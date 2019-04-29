@@ -4,7 +4,7 @@ Library designed to make things look _prettier_.
 
 ## Usage
 
-[intro.md](#doc/intro.md)
+[intro.md](https://github.com/mishadoff/prettier/blob/master/doc/intro.md)
 
 ## License
 
