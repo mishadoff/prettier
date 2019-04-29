@@ -1,0 +1,8 @@
+language: clojure
+lein: lein
+script: lein do clean, javac, test
+dist: trusty
+after_script:
+  - bash -ex resources/coveralls.sh
+jdk:
+  - openjdk8

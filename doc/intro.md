@@ -1,10 +1,8 @@
 # `prettier.diff`
 
-```clojure
-(:require [prettier.diff :as diff])
-```
+`(:require [prettier.diff :as diff])`
 
-Diff module shows changes between data structure.
+Diff module shows changes between data structures.
 Currently, only **maps** supported.
 
 ## maps
@@ -52,9 +50,7 @@ and extremely helpful for debugging config changes
 
 # `prettier.size`
 
-```clojure
-(:require [prettier.size :as size])
-```
+`(:require [prettier.size :as size])`
 
 Size module can convert bytes to human readable representation.
 
@@ -109,9 +105,7 @@ Custom parsing options could be provided using bindings.
 
 # `prettier.time`
 
-```clojure
-(:require [prettier.time :as time])
-```
+`(:require [prettier.time :as time])`
 
 How often do you add something like 
 
