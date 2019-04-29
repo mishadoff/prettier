@@ -34,6 +34,12 @@
     (is (= "3gigabytes" (size/bytes->readable 3723446000)))
     (is (= "...too much..." (size/bytes->readable 1723446000000)))))
 
+(deftest bytes->readable--classic-units-test
+  (binding [size/*power* 1000]
+    (is (= "500 B" (size/bytes->readable 500)))
+    (is (= "1.0 KB" (size/bytes->readable 1000)))
+    (is (= "5.0 MB" (size/bytes->readable (* 5 1000 1000))))))
+
 ;;;
 
 (deftest readable->bytes--test

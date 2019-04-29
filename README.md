@@ -4,7 +4,7 @@ Library designed to make things look _prettier_.
 
 ## Usage
 
-FIXME
+[intro.md](#doc/intro.md)
 
 ## License
 

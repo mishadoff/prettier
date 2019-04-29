@@ -4,6 +4,8 @@
 (def ^:dynamic *size-abbreviations*
   ["B" "KB" "MB" "GB" "TB" "PB" "EB" "ZB" "YB"])
 
+(def ^:dynamic *power* 1024)
+
 (def ^:dynamic *size-decimal-format* "%.1f")
 (def ^:dynamic *size-gap* " ")
 (def ^:dynamic *size-over-limit* "Infinity")
@@ -17,12 +19,12 @@
   (loop [order 0 bnum (* 1.0 b)]
     (cond
       (>= order (count *size-abbreviations*)) *size-over-limit*
-      (<= 0 bnum 1023)
+      (<= 0 bnum (dec *power*))
       (let [effective-decimal-fmt (if (zero? order) "%.0f" *size-decimal-format*)]
             (format (str effective-decimal-fmt *size-gap* "%s")
                     bnum
                     (nth *size-abbreviations* order)))
-      :else (recur (inc order) (/ bnum 1024)))))
+      :else (recur (inc order) (/ bnum *power*)))))
 
 ;;;
 
@@ -52,6 +54,6 @@
                    second)]
     (when (and num (>= num 0) order)
       (-> num
-          (* (->> (repeat order 1024)
+          (* (->> (repeat order *power*)
                   (reduce *')))
           (bigint)))))

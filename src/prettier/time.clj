@@ -75,7 +75,6 @@
     (some->> *reverse-time-units*
              (map (fn [[unit-key candidates]]
                     (when (candidates unit) unit-key)))
-             ((fn [e] (println e) e))
              (remove nil?)
              ;; ambiguity check
              ((fn [v]
