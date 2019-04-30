@@ -14,7 +14,7 @@
   "Calculates levenshtein distance between two sequences
   Levenshtein distance roughly defines number of changes
   which required to apply to transform 'seq1' into 'seq2'
-  Example: conider strings as sequence of letters
+  Example: consider strings as sequence of letters
   (distance \"bear\" \"beer\") => 1 (1st change from 'a' to 'e')
   (distance \"dog\" \"doll\") => 2 (1st change from 'g' to 'l', 2nd change insertion of 'l')"
   [seq1 seq2]
