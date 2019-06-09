@@ -48,6 +48,38 @@ and extremely helpful for debugging config changes
  #prettier.diff.MapKeyRenamed{:key-from [:auth :token], :key-to [:auth :refresh-token], :value "Xz12Hfep1m)f__f"})
 ```
 
+# `prettier.maybe`
+
+`(:require [prettier.maybe :as maybe])`
+
+Maybe package adds a bit of fuzzy logic into your application.
+
+Consider some function which received incorrect value. 
+It can react with different levels of 'helpfulness'
+
+- Level 0: Value is silently consumed, no error is thrown
+- Level 1: Error is thrown `INVALID VALUE` 
+- Level 2: Error is thrown with reference to invalid value `INVALID VALUE 'sting'` 
+- Level 3: Error is thrown with reference to invalid value and list of allowed values `INVALID VALUE 'sring', but allowed are ['string' 'integer' 'double']`  
+- Level 4: Error is thrown with reference to invalid value, list of allowed values and __candidates__ for correct value 
+`INVALID VALUE 'sring', Maybe you mean 'string'? Allowed are ['string' 'integer' 'double'].`
+
+This has limited application, but more helpful than standard approach.
+
+```clojure
+(maybe/candidates ["string" "number" "integer"] "sring")
+=> ("string")
+```
+
+By default it uses _levenshtein distance_ for similarity with distance <= 2.
+But could be overriden using `maybe/*distance*` binding.
+
+```clojure
+(binding [maybe/*distance* 3]
+  (maybe/candidates ["string" "number" "integer"] "numeric"))
+=> ("number")
+```
+
 # `prettier.size`
 
 `(:require [prettier.size :as size])`
