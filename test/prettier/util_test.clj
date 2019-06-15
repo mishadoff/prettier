@@ -22,3 +22,8 @@
   (is (= 1 (util/distance [:a :b :c :d] [:a :b :d])))
   (is (= 1 (util/distance ["NAME" "SURNAME" "AGE"] ["NAME" "AGE"])))
   (is (= 1 (util/distance {:a 1 :b 2 :c 3} {:a 2 :b 2 :c 3}))))
+
+(deftest duplicates--test
+  (is (= #{} (util/duplicates [1 2 3])))
+  (is (= #{1} (util/duplicates [1 2 3 1])))
+  (is (= #{1 2 3} (util/duplicates [1 2 3 1 2 3 1]))))

@@ -32,3 +32,13 @@
                               []
                               init-row))]
     (peek (reduce advance-row init-row seq2))))
+
+(defn duplicates
+  "Return list of duplicates in collection.
+   Duplicate is an item which appears more than once"
+  [coll]
+  (->> coll
+       (frequencies)
+       (filter (comp (partial < 1) second))
+       (map first)
+       (into #{})))
